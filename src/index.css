@@ -20,10 +20,13 @@
   gap: 1rem;
   align-items: center;
   margin: auto;
+  position: relative;
+  z-index: 1000 !important;
 }
 
 .hero-text {
   font-size: 4rem;
+  color: #fff;
 }
 
 .hero-subdiv {

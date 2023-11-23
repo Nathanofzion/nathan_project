@@ -39,7 +39,7 @@ const BgParticles = () => {
       options={{
         background: {
           color: {
-            value: "transparent",
+            value: "#000000",
           },
         },
         fpsLimit: 120,
