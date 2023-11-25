@@ -9,16 +9,33 @@ import {
   CameraControls,
   Text,
 } from "@react-three/drei";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { TextureLoader } from "three";
 import logo from "../assets/logo.png";
 
 function Earth(props) {
   const ref = useRef();
+  const [animationFinished, setAnimationFinished] = useState(false);
+  const { startFading } = props;
+
   const { nodes, materials } = useGLTF("/earth-transformed.glb");
+
   useFrame((state, delta) => {
-    ref.current.position.y = Math.sin(state.clock.elapsedTime / 1.5) / 10;
-    ref.current.rotation.y += delta / 15;
+    if (!animationFinished) {
+      ref.current.position.y = Math.sin(state.clock.elapsedTime / 1.5) / 10;
+      ref.current.rotation.y += delta / 15;
+
+      // Check if the animation has finished (adjust the condition as needed)
+      if (
+        startFading &&
+        state.clock.elapsedTime > /* Adjust the duration of the animation */ 5
+      ) {
+        setAnimationFinished(true);
+      }
+    } else {
+      // If animation has finished, hide the Earth model
+      ref.current.visible = false;
+    }
   });
 
   return (
@@ -51,7 +68,7 @@ function ImageMesh({
       ref.current.rotation.z += delta * 0.1;
 
       // Move the text along the Y-axis
-      ref.current.position.x += delta * 0.1; // Adjust the speed as needed
+      ref.current.position.x += delta; // Adjust the speed as needed
 
       // Optionally, you can remove the text when it's out of view
       if (ref.current.position.y > 5) {
@@ -85,14 +102,12 @@ function TextMesh({
 
   useFrame((state, delta) => {
     if (animate) {
-      ref.current.rotation.x += delta * 0.1; // Adjust the speed as needed
+      ref.current.rotation.x += delta * 0.01;
       ref.current.rotation.y += delta * 0.1;
       ref.current.rotation.z += delta * 0.1;
 
-      // Move the text along the Y-axis
-      ref.current.position.x += delta * 0.1; // Adjust the speed as needed
+      ref.current.position.x += delta;
 
-      // Optionally, you can remove the text when it's out of view
       if (ref.current.position.y > 5) {
         ref.current.visible = false;
       }
@@ -102,6 +117,7 @@ function TextMesh({
   return (
     <group ref={ref} position={position} rotation={rotation}>
       <Text
+        // font={trebuchetBoldFont}
         fontSize={size}
         color={color}
         anchorX="center"
@@ -117,16 +133,28 @@ function TextMesh({
 
 export default function Viewer() {
   const [animateText, setAnimateText] = useState(false);
+  const [startFading, setStartFading] = useState(false);
 
   const startAnimation = () => {
     setAnimateText(true);
+
+    setTimeout(() => {
+      setStartFading(true);
+    }, 5000);
   };
   return (
-    <>
+    <div
+      style={{
+        display: "block",
+        width: "100%",
+        height: "calc(100vh - 2rem)",
+        overflow: "hidden",
+      }}
+    >
       <button onClick={startAnimation}>Start Animation</button>
-      <Canvas shadows camera={{ position: [5, 2, 0], fov: 55 }}>
+      <Canvas camera={{ position: [5, 2, 0], fov: 55 }}>
         <group position={[0, 0.5, 0]}>
-          <RoundedBox castShadow scale={2.1}>
+          <RoundedBox scale={2.1}>
             <MeshTransmissionMaterial
               backside
               backsideThickness={-1}
@@ -134,7 +162,7 @@ export default function Viewer() {
               anisotropicBlur={0.02}
             />
           </RoundedBox>
-          <Earth scale={0.7} position={[0, 0, 0]} />
+          <Earth scale={0.7} position={[0, 0, 0]} startFading={startFading} />
 
           {/* Text on the top */}
           <ImageMesh
@@ -151,7 +179,7 @@ export default function Viewer() {
             text="g"
             position={[0.1, 0.2, 1]}
             size={2}
-            color={"#111"}
+            color={"#2A2A2C"}
             rotation={[0, 0, 0]}
             perspectiveScale={[1, 1, 1]} // Adjust the scale for perspective
             animate={animateText}
@@ -162,7 +190,7 @@ export default function Viewer() {
             text="3"
             position={[1, -0.2, 0]}
             size={2}
-            color={"#111"}
+            color={"#2A2A2C"}
             rotation={[0, -Math.PI / 2, 0]}
             perspectiveScale={[-1, 1, 1]} // Adjust the scale for perspective
             animate={animateText}
@@ -170,7 +198,6 @@ export default function Viewer() {
         </group>
         <Environment
           files="https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/1k/dancing_hall_1k.hdr"
-          background
           blur={1}
         />
         <AccumulativeShadows
@@ -183,6 +210,6 @@ export default function Viewer() {
         </AccumulativeShadows>
         <CameraControls />
       </Canvas>
-    </>
+    </div>
   );
 }

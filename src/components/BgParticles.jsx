@@ -69,7 +69,7 @@ const BgParticles = ({ isDarkMode }) => {
             value: isDarkMode ? "#000000" : "#ffffff",
           },
           links: {
-            color: isDarkMode ? "#000000" : "#ffffff",
+            color: isDarkMode ? "#fff" : "#000",
             distance: 150,
             enable: true,
             opacity: 0.5,
@@ -82,7 +82,7 @@ const BgParticles = ({ isDarkMode }) => {
               default: "bounce",
             },
             random: false,
-            speed: 6,
+            speed: 5,
             straight: false,
           },
           rotate: {
