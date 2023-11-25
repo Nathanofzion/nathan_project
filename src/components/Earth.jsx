@@ -1,4 +1,3 @@
-import * as THREE from "three";
 import { Canvas, useFrame } from "@react-three/fiber";
 import {
   useGLTF,
@@ -10,7 +9,7 @@ import {
   CameraControls,
   Text,
 } from "@react-three/drei";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 
 function Earth(props) {
   const ref = useRef();
@@ -33,9 +32,35 @@ function Earth(props) {
   );
 }
 
-function TextMesh({ text, position, size, color, rotation, perspectiveScale }) {
+function TextMesh({
+  text,
+  position,
+  size,
+  color,
+  rotation,
+  perspectiveScale,
+  animate,
+}) {
+  const ref = useRef();
+
+  useFrame((state, delta) => {
+    if (animate) {
+      ref.current.rotation.x += delta * 0.1; // Adjust the speed as needed
+      ref.current.rotation.y += delta * 0.1;
+      ref.current.rotation.z += delta * 0.1;
+
+      // Move the text along the Y-axis
+      ref.current.position.x += delta * 0.1; // Adjust the speed as needed
+
+      // Optionally, you can remove the text when it's out of view
+      if (ref.current.position.y > 5) {
+        ref.current.visible = false;
+      }
+    }
+  });
+
   return (
-    <group position={position} rotation={rotation}>
+    <group ref={ref} position={position} rotation={rotation}>
       <Text
         fontSize={size}
         color={color}
@@ -51,130 +76,74 @@ function TextMesh({ text, position, size, color, rotation, perspectiveScale }) {
 }
 
 export default function Viewer() {
+  const [animateText, setAnimateText] = useState(false);
+
+  const startAnimation = () => {
+    setAnimateText(true);
+  };
   return (
-    <Canvas
-      shadows
-      camera={{ position: [5, 2, 0], fov: 55 }}
-      background={null}
-      alpha={0.1}
-    >
-      <group position={[0, 0.5, 0]}>
-        <RoundedBox castShadow scale={2.1}>
-          <MeshTransmissionMaterial
-            backside
-            backsideThickness={-1}
-            thickness={0.2}
-            anisotropicBlur={0.02}
+    <>
+      <button onClick={startAnimation}>Start Animation</button>
+      <Canvas shadows camera={{ position: [5, 2, 0], fov: 55 }}>
+        <group position={[0, 0.5, 0]}>
+          <RoundedBox castShadow scale={2.1}>
+            <MeshTransmissionMaterial
+              backside
+              backsideThickness={-1}
+              thickness={0.2}
+              anisotropicBlur={0.02}
+            />
+          </RoundedBox>
+          <Earth scale={0.7} position={[0, 0, 0]} />
+
+          {/* Text on the top */}
+          <TextMesh
+            text="Zi"
+            position={[0, 1, 0.2]}
+            size={2}
+            color={"#111"}
+            rotation={[-Math.PI / 2, 0, 0]}
+            perspectiveScale={[1, 1, 1]} // Adjust the scale for perspective
+            animate={animateText}
           />
-        </RoundedBox>
-        <Earth scale={0.7} position={[0, 0, 0]} />
 
-        {/* Text on the top */}
-        <TextMesh
-          text="Zi"
-          position={[0, 1, 0.2]}
-          size={2}
-          color={"#111"}
-          rotation={[-Math.PI / 2, 0, 0]}
-          perspectiveScale={[1, 1, 1]} // Adjust the scale for perspective
-          thickness={200}
-        />
+          {/* Text on one side */}
+          <TextMesh
+            text="g"
+            position={[0.1, 0.2, 1]}
+            size={2}
+            color={"#111"}
+            rotation={[0, 0, 0]}
+            perspectiveScale={[1, 1, 1]} // Adjust the scale for perspective
+            animate={animateText}
+          />
 
-        {/* Text on one side */}
-        <TextMesh
-          text="g"
-          position={[0.1, 0.2, 1]}
-          size={2}
-          color={"#111"}
-          rotation={[0, 0, 0]}
-          perspectiveScale={[1, 1, 1]} // Adjust the scale for perspective
-          thickness={200}
+          {/* Text on the other side */}
+          <TextMesh
+            text="3"
+            position={[1, -0.2, 0]}
+            size={2}
+            color={"#111"}
+            rotation={[0, -Math.PI / 2, 0]}
+            perspectiveScale={[-1, 1, 1]} // Adjust the scale for perspective
+            animate={animateText}
+          />
+        </group>
+        <Environment
+          files="https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/1k/dancing_hall_1k.hdr"
+          background
+          blur={1}
         />
-
-        {/* Text on the other side */}
-        <TextMesh
-          text="3"
-          position={[1, -0.2, 0]}
-          size={2}
-          color={"#111"}
-          rotation={[0, -Math.PI / 2, 0]}
-          perspectiveScale={[-1, 1, 1]} // Adjust the scale for perspective
-          thickness={200}
-        />
-      </group>
-      <Environment
-        files="https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/1k/dancing_hall_1k.hdr"
-        background
-        blur={1}
-      />
-      <AccumulativeShadows
-        color="lightblue"
-        position={[0, -1, 0]}
-        frames={100}
-        opacity={0.75}
-      >
-        <RandomizedLight radius={10} position={[-5, 5, 2]} />
-      </AccumulativeShadows>
-      <CameraControls />
-    </Canvas>
+        <AccumulativeShadows
+          color="lightblue"
+          position={[0, -1, 0]}
+          frames={100}
+          opacity={0.75}
+        >
+          <RandomizedLight radius={10} position={[-5, 5, 2]} />
+        </AccumulativeShadows>
+        <CameraControls />
+      </Canvas>
+    </>
   );
 }
-// import React, { useState } from "react";
-// import { Canvas, useFrame } from "@react-three/fiber";
-// import { useGLTF, Environment, Text } from "@react-three/drei";
-// import { useSpring, animated } from "react-spring";
-// import AnimatedText from "../components/AnimatedText";
-
-// function Earth({ visible }) {
-//   const { nodes, materials } = useGLTF("/earth-transformed.glb");
-
-//   return (
-//     <animated.group visible={visible} dispose={null}>
-//       <mesh
-//         castShadow
-//         receiveShadow
-//         geometry={nodes.Object_4.geometry}
-//         material={materials["Scene_-_Root"]}
-//         scale={1.128}
-//       />
-//     </animated.group>
-//   );
-// }
-
-// export default function Viewer() {
-//   const [animationActive, setAnimationActive] = useState(true);
-
-//   const handleButtonClick = () => {
-//     setAnimationActive(!animationActive);
-//   };
-
-//   return (
-//     <div>
-//       <button onClick={handleButtonClick}>Toggle Animation</button>
-//       <Canvas
-//         shadows
-//         camera={{ position: [5, 2, 0], fov: 55 }}
-//         background={null}
-//         alpha={0.1}
-//       >
-//         <group position={[0, 0.5, 0]}>
-//           <Earth visible={animationActive} />
-//           <AnimatedText
-//             text="Zi"
-//             position={[0, 1, 0.2]}
-//             size={2}
-//             color="#111"
-//             rotation={[-Math.PI / 2, 0, 0]}
-//             perspectiveScale={[1, 1, 1]}
-//             visible={animationActive}
-//           />
-//         </group>
-//         <Environment
-//           files="https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/1k/dancing_hall_1k.hdr"
-//           background
-//           blur={1}
-//         />
-//       </Canvas>
-//     </div>
-//   );
-// }

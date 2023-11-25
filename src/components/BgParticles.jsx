@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useCallback } from "react";
-// import type { Container, Engine } from "tsparticles-engine";
 import Particles from "react-particles";
 import { loadSlim } from "tsparticles-slim";
 import { loadImageShape } from "tsparticles-shape-image";
 
-const BgParticles = () => {
+const BgParticles = ({ isDarkMode }) => {
   const [width, setWidth] = useState(window.innerWidth);
 
   function handleWindowSizeChange() {
@@ -39,7 +38,7 @@ const BgParticles = () => {
       options={{
         background: {
           color: {
-            value: "#000000",
+            value: isDarkMode ? "#000000" : "#ffffff",
           },
         },
         fpsLimit: 120,
@@ -67,10 +66,10 @@ const BgParticles = () => {
         },
         particles: {
           color: {
-            value: "#ffffff",
+            value: isDarkMode ? "#000000" : "#ffffff",
           },
           links: {
-            color: "#ffffff",
+            color: isDarkMode ? "#000000" : "#ffffff",
             distance: 150,
             enable: true,
             opacity: 0.5,

@@ -31,7 +31,7 @@
 
 .hero-subdiv {
   width: 50%;
-  height: 20rem;
+  height: calc(100vh - 2rem);
   display: flex;
   align-items: center;
 }
@@ -52,4 +52,30 @@
     display: flex;
     align-items: center;
   }
+}
+
+button {
+  background-color: red;
+}
+
+.darkmodediv {
+  z-index: 10000;
+  display: flex;
+  background-color: rgb(0, 107, 107);
+  padding: 0.4rem 2rem;
+  position: absolute;
+  border-radius: 2rem;
+  gap: 1rem;
+  top: 1rem;
+  right: 1rem;
+}
+
+.darkmodebtn {
+  width: 2rem;
+}
+
+.darkmodebtn.active {
+  background-color: #fff;
+  padding: 0.2rem;
+  border-radius: 100%;
 }
