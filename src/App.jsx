@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import BgParticles from "./components/BgParticles";
 import Hero from "./pages/Hero";
-import sun from "../public/sun.svg";
-import moon from "../public/moon.svg";
+import sun from "./assets/sun.svg";
+import moon from "./assets/moon.svg";
 
 const App = () => {
   const [isDarkMode, setIsDarkMode] = useState(true);

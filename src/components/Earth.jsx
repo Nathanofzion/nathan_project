@@ -10,6 +10,8 @@ import {
   Text,
 } from "@react-three/drei";
 import { useRef, useState } from "react";
+import { TextureLoader } from "three";
+import logo from "../assets/logo.png";
 
 function Earth(props) {
   const ref = useRef();
@@ -28,6 +30,44 @@ function Earth(props) {
         material={materials["Scene_-_Root"]}
         scale={1.128}
       />
+    </group>
+  );
+}
+
+function ImageMesh({
+  imageUrl,
+  position,
+  size,
+  rotation,
+  perspectiveScale,
+  animate,
+}) {
+  const ref = useRef();
+
+  useFrame((state, delta) => {
+    if (animate) {
+      ref.current.rotation.x += delta * 0.1; // Adjust the speed as needed
+      ref.current.rotation.y += delta * 0.1;
+      ref.current.rotation.z += delta * 0.1;
+
+      // Move the text along the Y-axis
+      ref.current.position.x += delta * 0.1; // Adjust the speed as needed
+
+      // Optionally, you can remove the text when it's out of view
+      if (ref.current.position.y > 5) {
+        ref.current.visible = false;
+      }
+    }
+  });
+
+  const texture = new TextureLoader().load(imageUrl);
+
+  return (
+    <group ref={ref} position={position} rotation={rotation}>
+      <mesh>
+        <planeGeometry args={[size, size]} />
+        <meshBasicMaterial map={texture} transparent />
+      </mesh>
     </group>
   );
 }
@@ -97,13 +137,12 @@ export default function Viewer() {
           <Earth scale={0.7} position={[0, 0, 0]} />
 
           {/* Text on the top */}
-          <TextMesh
-            text="Zi"
+          <ImageMesh
+            imageUrl={logo} // replace with your image path
             position={[0, 1, 0.2]}
-            size={2}
-            color={"#111"}
+            size={4}
             rotation={[-Math.PI / 2, 0, 0]}
-            perspectiveScale={[1, 1, 1]} // Adjust the scale for perspective
+            perspectiveScale={[1, 1, 1]}
             animate={animateText}
           />
 
