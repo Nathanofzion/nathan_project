@@ -20,7 +20,6 @@
     "react-dom": "^18.2.0",
     "react-particles": "^2.12.2",
     "react-spring": "^9.7.3",
-    "react-tsparticles": "^2.12.2",
     "three": "^0.158.0",
     "tsparticles-shape-image": "^2.12.0",
     "tsparticles-slim": "^2.12.0"
