@@ -134,6 +134,13 @@ function TextMesh({
 export default function Viewer() {
   const [animateText, setAnimateText] = useState(false);
   const [startFading, setStartFading] = useState(false);
+  const [isBoxVisible, setIsBoxVisible] = useState(true);
+
+  useEffect(() => {
+    if (startFading) {
+      setIsBoxVisible(false);
+    }
+  }, [startFading]);
 
   const startAnimation = () => {
     setAnimateText(true);
@@ -142,6 +149,7 @@ export default function Viewer() {
       setStartFading(true);
     }, 5000);
   };
+
   return (
     <div
       style={{
@@ -154,14 +162,16 @@ export default function Viewer() {
       <button onClick={startAnimation}>Start Animation</button>
       <Canvas camera={{ position: [5, 2, 0], fov: 55 }}>
         <group position={[0, 0.5, 0]}>
-          <RoundedBox scale={2.1}>
-            <MeshTransmissionMaterial
-              backside
-              backsideThickness={-1}
-              thickness={0.2}
-              anisotropicBlur={0.02}
-            />
-          </RoundedBox>
+          {isBoxVisible && (
+            <RoundedBox scale={2.1}>
+              <MeshTransmissionMaterial
+                backside
+                backsideThickness={-1}
+                thickness={0.2}
+                anisotropicBlur={0.02}
+              />
+            </RoundedBox>
+          )}
           <Earth scale={0.7} position={[0, 0, 0]} startFading={startFading} />
 
           {/* Text on the top */}
