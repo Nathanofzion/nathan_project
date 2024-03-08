@@ -21,13 +21,13 @@ const BgParticles = ({ isDarkMode }) => {
   const isMobile = width <= 768;
 
   const particlesInit = useCallback(async (engine) => {
-    console.log(engine);
+    // console.log(engine);
     await loadSlim(engine);
     await loadImageShape(engine);
   }, []);
 
   const particlesLoaded = useCallback(async (container) => {
-    await console.log(container);
+    await null;
   }, []);
 
   return (
@@ -38,7 +38,7 @@ const BgParticles = ({ isDarkMode }) => {
       options={{
         background: {
           color: {
-            value: isDarkMode ? "#000000" : "#ffffff",
+            value: isDarkMode ? "#222" : "#ffffff",
           },
         },
         fpsLimit: 120,

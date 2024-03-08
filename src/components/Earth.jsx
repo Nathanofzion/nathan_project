@@ -1,45 +1,48 @@
+import React, { Suspense, useRef, useState, useEffect } from "react";
+import * as THREE from "three";
 import { Canvas, useFrame } from "@react-three/fiber";
 import {
+  OrbitControls,
   useGLTF,
+  MeshTransmissionMaterial,
   RoundedBox,
   Environment,
-  MeshTransmissionMaterial,
+  CameraControls,
   AccumulativeShadows,
   RandomizedLight,
-  CameraControls,
-  Text,
+  Preload,
 } from "@react-three/drei";
-import { useRef, useState, useEffect } from "react";
-import { TextureLoader } from "three";
-import logo from "../assets/logo.png";
+import { FontLoader } from "three/addons/loaders/FontLoader.js";
+import { TextGeometry } from "three/addons/geometries/TextGeometry.js";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 
-function Earth(props) {
+function Earth({ startAnimation, ...props }) {
   const ref = useRef();
-  const [animationFinished, setAnimationFinished] = useState(false);
-  const { startFading } = props;
-
   const { nodes, materials } = useGLTF("/earth-transformed.glb");
+  const [opacity, setOpacity] = useState(0.9);
 
   useFrame((state, delta) => {
-    if (!animationFinished) {
+    if (startAnimation && ref.current) {
+      // Update object position and rotation if startAnimation is true
       ref.current.position.y = Math.sin(state.clock.elapsedTime / 1.5) / 10;
       ref.current.rotation.y += delta / 15;
 
-      // Check if the animation has finished (adjust the condition as needed)
-      if (
-        startFading &&
-        state.clock.elapsedTime > /* Adjust the duration of the animation */ 5
-      ) {
-        setAnimationFinished(true);
+      // Gradually reduce opacity if startAnimation is true
+      if (opacity > 0) {
+        const newOpacity = opacity - delta / 2;
+        setOpacity(Math.max(0, newOpacity));
       }
-    } else {
-      // If animation has finished, hide the Earth model
-      ref.current.visible = false;
+
+      // Update material opacity if startAnimation is true
+      if (ref.current.material) {
+        ref.current.material.transparent = true;
+        ref.current.material.opacity = opacity;
+      }
     }
   });
 
   return (
-    <group {...props} dispose={null}>
+    <group {...props}>
       <mesh
         castShadow
         ref={ref}
@@ -51,160 +54,134 @@ function Earth(props) {
   );
 }
 
-function ImageMesh({
-  imageUrl,
-  position,
-  size,
-  rotation,
-  perspectiveScale,
-  animate,
-}) {
-  const ref = useRef();
-
-  useFrame((state, delta) => {
-    if (animate) {
-      ref.current.rotation.x += delta * 0.1; // Adjust the speed as needed
-      ref.current.rotation.y += delta * 0.1;
-      ref.current.rotation.z += delta * 0.1;
-
-      // Move the text along the Y-axis
-      ref.current.position.x += delta; // Adjust the speed as needed
-
-      // Optionally, you can remove the text when it's out of view
-      if (ref.current.position.y > 5) {
-        ref.current.visible = false;
-      }
-    }
-  });
-
-  const texture = new TextureLoader().load(imageUrl);
-
-  return (
-    <group ref={ref} position={position} rotation={rotation}>
-      <mesh>
-        <planeGeometry args={[size, size]} />
-        <meshBasicMaterial map={texture} transparent />
-      </mesh>
-    </group>
-  );
-}
-
-function TextMesh({
-  text,
-  position,
-  size,
-  color,
-  rotation,
-  perspectiveScale,
-  animate,
-}) {
-  const ref = useRef();
-
-  useFrame((state, delta) => {
-    if (animate) {
-      ref.current.rotation.x += delta * 0.01;
-      ref.current.rotation.y += delta * 0.1;
-      ref.current.rotation.z += delta * 0.1;
-
-      ref.current.position.x += delta;
-
-      if (ref.current.position.y > 5) {
-        ref.current.visible = false;
-      }
-    }
-  });
-
-  return (
-    <group ref={ref} position={position} rotation={rotation}>
-      <Text
-        // font={trebuchetBoldFont}
-        fontSize={size}
-        color={color}
-        anchorX="center"
-        anchorY="middle"
-        scale={perspectiveScale}
-        depthTest={false}
-      >
-        {text}
-      </Text>
-    </group>
-  );
-}
-
-export default function Viewer() {
-  const [animateText, setAnimateText] = useState(false);
-  const [startFading, setStartFading] = useState(false);
-  const [isBoxVisible, setIsBoxVisible] = useState(true);
+const TextOnFaces = ({ startAnimation }) => {
+  const cubeRef = useRef();
+  const textMeshes = useRef([]);
 
   useEffect(() => {
-    if (startFading) {
-      setIsBoxVisible(false);
+    const cube = cubeRef.current;
+
+    const addTextToFace = (text, position, rotation) => {
+      const loader = new FontLoader();
+
+      loader.load("/American Typewriter_Regular.json", function (font) {
+        if (font && font.generateShapes) {
+          const textGeometry = new TextGeometry(text, {
+            font: font,
+            size: 1.5,
+            height: 0.1,
+          });
+
+          const material = new THREE.MeshBasicMaterial({ color: 0x58585d });
+          const textMesh = new THREE.Mesh(textGeometry, material);
+
+          textMesh.position.copy(position);
+          textMesh.rotation.copy(rotation);
+
+          cube.add(textMesh);
+          textMeshes.current.push(textMesh);
+
+          // Fade in animation
+          let opacity = 0;
+          const fadeInInterval = setInterval(() => {
+            opacity += 0.1; // Adjust the increment value as needed
+            if (opacity >= 1) {
+              clearInterval(fadeInInterval);
+            }
+            textMesh.material.transparent = true;
+            textMesh.material.opacity = opacity;
+          }, 5); // Adjust the interval as needed
+        } else {
+          console.error("Invalid font or missing generateShapes method.");
+        }
+      });
+    };
+
+    const addLogoToFace = (modelPath, position, rotation) => {
+      const loader = new GLTFLoader();
+
+      loader.load(modelPath, function (gltf) {
+        const logo = gltf.scene;
+
+        // Set initial position, rotation, and scale
+        logo.position.copy(position);
+        logo.rotation.copy(rotation);
+        logo.scale.set(3.5, 3.5, 3.5); // Adjust scale as needed
+
+        // Set transparent material for the entire model scene
+        logo.traverse((child) => {
+          if (child.isMesh) {
+            child.material.transparent = true;
+            child.material.opacity = 0; // Start with opacity 0 to fade in
+          }
+        });
+
+        cube.add(logo);
+        textMeshes.current.push(logo);
+
+        // Fade in animation for the entire model scene
+        let opacity = 0;
+        const fadeInInterval = setInterval(() => {
+          opacity += 0.1; // Adjust the increment value as needed
+          if (opacity >= 1) {
+            clearInterval(fadeInInterval);
+          }
+          logo.traverse((child) => {
+            if (child.isMesh) {
+              child.material.opacity = opacity;
+            }
+          });
+        }, 5); // Adjust the interval as needed
+      });
+    };
+
+    // Add text to each face
+    if (startAnimation) {
+      addTextToFace("g", new THREE.Vector3(-0.4, -0.3, 1), new THREE.Euler());
+      addLogoToFace(
+        "/zig3-logo-new.glb",
+        new THREE.Vector3(0.2, 0.15, 0),
+        new THREE.Euler(-Math.PI / 2, 0, 0)
+      );
+      addTextToFace(
+        "3",
+        new THREE.Vector3(1, -0.5, 0.5),
+        new THREE.Euler(0, Math.PI / 2, 0)
+      );
     }
-  }, [startFading]);
-
-  const startAnimation = () => {
-    setAnimateText(true);
-
-    setTimeout(() => {
-      setStartFading(true);
-    }, 5000);
-  };
+  }, [startAnimation]);
 
   return (
-    <div
-      style={{
-        display: "block",
-        width: "100%",
-        height: "calc(100vh - 2rem)",
-        overflow: "hidden",
-      }}
-    >
-      <button onClick={startAnimation}>Start Animation</button>
-      <Canvas camera={{ position: [5, 2, 0], fov: 55 }}>
+    <mesh ref={cubeRef}>
+      <RoundedBox scale={2}>
+        <MeshTransmissionMaterial
+          backside
+          backsideThickness={-1}
+          thickness={0.02}
+          anisotropicBlur={0.02}
+          opacity={0.5}
+          transparent={true}
+        />
+      </RoundedBox>
+    </mesh>
+  );
+};
+
+export default function Viewer({ startAnimation }) {
+  return (
+    <Canvas camera={{ position: [5, 2, 0], fov: 55 }}>
+      <Suspense>
         <group position={[0, 0.5, 0]}>
-          {isBoxVisible && (
-            <RoundedBox scale={2.1}>
-              <MeshTransmissionMaterial
-                backside
-                backsideThickness={-1}
-                thickness={0.2}
-                anisotropicBlur={0.02}
-              />
-            </RoundedBox>
-          )}
-          <Earth scale={0.7} position={[0, 0, 0]} startFading={startFading} />
-
-          {/* Text on the top */}
-          <ImageMesh
-            imageUrl={logo} // replace with your image path
-            position={[0, 1, 0.2]}
-            size={4}
-            rotation={[-Math.PI / 2, 0, 0]}
-            perspectiveScale={[1, 1, 1]}
-            animate={animateText}
+          <ambientLight intensity={1} />
+          <hemisphereLight intensity={1} groundColor="black" />
+          <spotLight position={[-20, 50, 10]} intensity={10} />
+          <pointLight intensity={1} />
+          <Earth
+            scale={0.7}
+            position={[0, 0, 0]}
+            startAnimation={startAnimation}
           />
-
-          {/* Text on one side */}
-          <TextMesh
-            text="g"
-            position={[0.1, 0.2, 1]}
-            size={2}
-            color={"#2A2A2C"}
-            rotation={[0, 0, 0]}
-            perspectiveScale={[1, 1, 1]} // Adjust the scale for perspective
-            animate={animateText}
-          />
-
-          {/* Text on the other side */}
-          <TextMesh
-            text="3"
-            position={[1, -0.2, 0]}
-            size={2}
-            color={"#2A2A2C"}
-            rotation={[0, -Math.PI / 2, 0]}
-            perspectiveScale={[-1, 1, 1]} // Adjust the scale for perspective
-            animate={animateText}
-          />
+          <TextOnFaces startAnimation={startAnimation} />
         </group>
         <Environment
           files="https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/1k/dancing_hall_1k.hdr"
@@ -219,7 +196,8 @@ export default function Viewer() {
           <RandomizedLight radius={10} position={[-5, 5, 2]} />
         </AccumulativeShadows>
         <CameraControls />
-      </Canvas>
-    </div>
+      </Suspense>
+      <Preload all />
+    </Canvas>
   );
 }

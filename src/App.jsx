@@ -5,7 +5,7 @@ import sun from "./assets/sun.svg";
 import moon from "./assets/moon.svg";
 
 const App = () => {
-  const [isDarkMode, setIsDarkMode] = useState(true);
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
   // Function to toggle between dark and light modes
   const toggleTheme = () => {
