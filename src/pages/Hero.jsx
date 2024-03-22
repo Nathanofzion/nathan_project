@@ -8,46 +8,70 @@ const Hero = ({ isDarkMode }) => {
     setStartAnimation(true);
   };
 
-  const text = "Choose A Wallet To Login";
-  const gridTitle1 = "Zig3 V1 ";
-  const gridText1 = "The First wallet Integration";
-  const gridUrl1 = "Zig3.uk ";
-  const gridTitle2 = "Zig3 V2";
-  const gridText2 = "The Latest in Wallet Technology";
-  const gridUrl2 = "Zig3.org ";
-  const gridTitle3 = "Zig3 Web3 ";
-  const gridText3 = "The Web3 Domain use Brave to Browse";
-  const gridUrl3 = "Zig3.wallet";
+  const MatrixText = ({ text, delay }) => (
+    <span
+      className={`matrix-text ${startAnimation ? "fall-in" : ""}`}
+      style={{
+        color: isDarkMode ? "#fff" : "#000",
+        fontSize:
+          text === "Choose A Wallet To Login"
+            ? "3rem"
+            : delay === 0
+            ? "2rem"
+            : "1rem",
+        fontWeight: delay === 0 ? "bold" : "normal",
+        animationDelay: `${delay}s`,
+        display: "block",
+        whiteSpace: "pre-wrap",
+        marginTop: "1rem",
+      }}
+    >
+      {text}
+    </span>
+  );
+
+  const GridItem = ({ title, text, url, buttonUrl }) => (
+    <div style={{ flex: 1 }}>
+      <MatrixText text={title} delay={0} />
+      <MatrixText text={text} delay={title.length * 0.1} />
+      <MatrixText text={url} delay={(title.length + text.length) * 0.1} />
+      <a
+        href={buttonUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{ textDecoration: "none" }}
+      >
+        <button
+          style={{
+            marginTop: "2rem",
+            backgroundColor: "rgb(0, 107, 107)",
+            color: "#fff",
+            padding: ".7rem 1.5rem",
+            borderRadius: "0.7rem",
+            border: "none",
+            fontSize: "1rem",
+            cursor: "pointer",
+            display: "block",
+            margin: "1rem auto",
+          }}
+        >
+          Connect
+        </button>
+      </a>
+    </div>
+  );
 
   return (
     <div className="container">
       <div className="hero-div">
-        <div className="hero-subdiv">
+        <div className="hero-subdiv hero-model">
           <Earth startAnimation={startAnimation} />
-          {startAnimation && <div className="overlay"></div>}
         </div>
-        <div className="hero-subdiv" style={{ zIndex: 10 }}>
+        <div className="hero-subdiv hero-2" style={{ zIndex: 10 }}>
           <div>
             {startAnimation ? (
               <>
-                <div>
-                  {Array.from(text).map((char, index) => (
-                    <span
-                      key={index}
-                      className={`matrix-text ${
-                        startAnimation ? "fall-in" : ""
-                      }`}
-                      style={{
-                        color: isDarkMode ? "#fff" : "#000",
-                        fontSize: "4rem",
-                        fontWeight: "bold",
-                        animationDelay: `${index * 0.1}s`, // Adjust the delay as needed
-                      }}
-                    >
-                      {char}
-                    </span>
-                  ))}
-                </div>
+                <MatrixText text="Choose A Wallet To Login" delay={0} />
                 <div
                   style={{
                     width: "90%",
@@ -58,169 +82,54 @@ const Hero = ({ isDarkMode }) => {
                     textAlign: "center",
                   }}
                 >
-                  <div style={{ flex: 1 }}>
-                    {Array.from(gridTitle1).map((char, index) => (
-                      <span
-                        key={index}
-                        className={`matrix-text ${
-                          startAnimation ? "fall-in" : ""
-                        }`}
-                        style={{
-                          color: isDarkMode ? "#fff" : "#000",
-                          fontSize: "1.3rem",
-                          fontWeight: "bold",
-                          animationDelay: `${index * 0.1}s`, // Adjust the delay as needed
-                        }}
-                      >
-                        {char}
-                      </span>
-                    ))}
-                    {Array.from(gridText1).map((char, index) => (
-                      <span
-                        key={index}
-                        className={`matrix-text ${
-                          startAnimation ? "fall-in" : ""
-                        }`}
-                        style={{
-                          color: isDarkMode ? "#fff" : "#000",
-                          fontSize: "1rem",
-                          animationDelay: `${index * 0.1}s`, // Adjust the delay as needed
-                        }}
-                      >
-                        {char}
-                      </span>
-                    ))}
-                    {Array.from(gridUrl1).map((char, index) => (
-                      <span
-                        key={index}
-                        className={`matrix-text ${
-                          startAnimation ? "fall-in" : ""
-                        }`}
-                        style={{
-                          color: isDarkMode ? "#fff" : "#000",
-                          fontSize: "1rem",
-                          animationDelay: `${index * 0.1}s`, // Adjust the delay as needed
-                        }}
-                      >
-                        {char}
-                      </span>
-                    ))}
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    {Array.from(gridTitle2).map((char, index) => (
-                      <span
-                        key={index}
-                        className={`matrix-text ${
-                          startAnimation ? "fall-in" : ""
-                        }`}
-                        style={{
-                          color: isDarkMode ? "#fff" : "#000",
-                          fontSize: "1.3rem",
-                          fontWeight: "bold",
-                          animationDelay: `${index * 0.1}s`, // Adjust the delay as needed
-                        }}
-                      >
-                        {char}
-                      </span>
-                    ))}
-                    {Array.from(gridText2).map((char, index) => (
-                      <span
-                        key={index}
-                        className={`matrix-text ${
-                          startAnimation ? "fall-in" : ""
-                        }`}
-                        style={{
-                          color: isDarkMode ? "#fff" : "#000",
-                          fontSize: "1rem",
-                          animationDelay: `${index * 0.1}s`, // Adjust the delay as needed
-                        }}
-                      >
-                        {char}
-                      </span>
-                    ))}
-                    {Array.from(gridUrl2).map((char, index) => (
-                      <span
-                        key={index}
-                        className={`matrix-text ${
-                          startAnimation ? "fall-in" : ""
-                        }`}
-                        style={{
-                          color: isDarkMode ? "#fff" : "#000",
-                          fontSize: "1rem",
-                          animationDelay: `${index * 0.1}s`, // Adjust the delay as needed
-                        }}
-                      >
-                        {char}
-                      </span>
-                    ))}
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    {Array.from(gridTitle3).map((char, index) => (
-                      <span
-                        key={index}
-                        className={`matrix-text ${
-                          startAnimation ? "fall-in" : ""
-                        }`}
-                        style={{
-                          color: isDarkMode ? "#fff" : "#000",
-                          fontSize: "1.3rem",
-                          fontWeight: "bold",
-                          animationDelay: `${index * 0.1}s`, // Adjust the delay as needed
-                        }}
-                      >
-                        {char}
-                      </span>
-                    ))}
-                    {Array.from(gridText3).map((char, index) => (
-                      <span
-                        key={index}
-                        className={`matrix-text ${
-                          startAnimation ? "fall-in" : ""
-                        }`}
-                        style={{
-                          color: isDarkMode ? "#fff" : "#000",
-                          fontSize: "1rem",
-                          animationDelay: `${index * 0.1}s`, // Adjust the delay as needed
-                        }}
-                      >
-                        {char}
-                      </span>
-                    ))}
-                    {Array.from(gridUrl3).map((char, index) => (
-                      <span
-                        key={index}
-                        className={`matrix-text ${
-                          startAnimation ? "fall-in" : ""
-                        }`}
-                        style={{
-                          color: isDarkMode ? "#fff" : "#000",
-                          fontSize: "1rem",
-                          animationDelay: `${index * 0.1}s`, // Adjust the delay as needed
-                        }}
-                      >
-                        {char}
-                      </span>
-                    ))}
-                  </div>
+                  <GridItem
+                    title="Zig3 V1 "
+                    text="The First wallet Integration"
+                    url="Zig3.uk "
+                    buttonUrl="https://zig3.uk"
+                  />
+                  <GridItem
+                    title="Zig3 V2"
+                    text="The Latest in Wallet Technology"
+                    url="Zig3.org "
+                    buttonUrl="https://zig3.org"
+                  />
+                  <GridItem
+                    title="Zig3 Web3 "
+                    text="The Web3 Domain use Brave to Browse"
+                    url="Zig3.wallet"
+                    buttonUrl="https://zig3.wallet"
+                  />
                 </div>
               </>
             ) : (
-              <h1
-                style={{
-                  color: isDarkMode ? "#fff" : "#000",
-                  fontSize: "4rem",
-                  fontWeight: "bold",
-                }}
-              >
-                Connect the World With Zig3
-              </h1>
+              <>
+                <h1
+                  style={{
+                    color: isDarkMode ? "#fff" : "#000",
+                    fontSize: "4rem",
+                    fontWeight: "bold",
+                  }}
+                >
+                  Connect the World With Zig3
+                </h1>
+                <button className="loginbtn" onClick={handleLogin}>
+                  Login
+                </button>
+              </>
             )}
-            <button className="loginbtn" onClick={handleLogin}>
-              Login
-            </button>
           </div>
         </div>
       </div>
+
+      {/* Media query to adjust text sizes on smaller viewports */}
+      <style jsx>{`
+        @media (max-width: 768px) {
+          .matrix-text {
+            font-size: 1rem;
+          }
+        }
+      `}</style>
     </div>
   );
 };

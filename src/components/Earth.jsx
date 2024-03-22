@@ -72,7 +72,7 @@ const TextOnFaces = ({ startAnimation }) => {
             height: 0.1,
           });
 
-          const material = new THREE.MeshBasicMaterial({ color: 0x58585d });
+          const material = new THREE.MeshBasicMaterial({ color: 0x444444 });
           const textMesh = new THREE.Mesh(textGeometry, material);
 
           textMesh.position.copy(position);
@@ -106,7 +106,7 @@ const TextOnFaces = ({ startAnimation }) => {
         // Set initial position, rotation, and scale
         logo.position.copy(position);
         logo.rotation.copy(rotation);
-        logo.scale.set(3.5, 3.5, 3.5); // Adjust scale as needed
+        logo.scale.set(3, 3, 3); // Adjust scale as needed
 
         // Set transparent material for the entire model scene
         logo.traverse((child) => {
@@ -137,16 +137,21 @@ const TextOnFaces = ({ startAnimation }) => {
 
     // Add text to each face
     if (startAnimation) {
-      addTextToFace("g", new THREE.Vector3(-0.4, -0.3, 1), new THREE.Euler());
       addLogoToFace(
-        "/zig3-logo-new.glb",
-        new THREE.Vector3(0.2, 0.15, 0),
+        "/zig3.glb",
+        new THREE.Vector3(0, 0.5, 0.2),
         new THREE.Euler(-Math.PI / 2, 0, 0)
       );
-      addTextToFace(
-        "3",
-        new THREE.Vector3(1, -0.5, 0.5),
+
+      addLogoToFace(
+        "/3.glb",
+        new THREE.Vector3(0.35, -0.3, 0),
         new THREE.Euler(0, Math.PI / 2, 0)
+      );
+      addLogoToFace(
+        "/g.glb",
+        new THREE.Vector3(-0.2, -0.3, 0.35),
+        new THREE.Euler()
       );
     }
   }, [startAnimation]);
@@ -172,10 +177,10 @@ export default function Viewer({ startAnimation }) {
     <Canvas camera={{ position: [5, 2, 0], fov: 55 }}>
       <Suspense>
         <group position={[0, 0.5, 0]}>
-          <ambientLight intensity={1} />
-          <hemisphereLight intensity={1} groundColor="black" />
+          {/* <ambientLight intensity={1} />
+          <hemisphereLight intensity={0.1} groundColor="black" />
           <spotLight position={[-20, 50, 10]} intensity={10} />
-          <pointLight intensity={1} />
+          <pointLight intensity={1} /> */}
           <Earth
             scale={0.7}
             position={[0, 0, 0]}
