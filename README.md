@@ -21,5 +21,5 @@
 4. **Run Project Locally**.
 
    ```bash
-  npm run dev
+   npm run dev
    ```
