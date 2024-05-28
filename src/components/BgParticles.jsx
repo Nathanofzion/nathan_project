@@ -82,7 +82,7 @@ const BgParticles = ({ isDarkMode }) => {
               default: "bounce",
             },
             random: false,
-            speed: 5,
+            speed: 2.5,
             straight: false,
           },
           rotate: {
@@ -112,7 +112,7 @@ const BgParticles = ({ isDarkMode }) => {
             },
           },
           size: {
-            value: { min: 8, max: 25 },
+            value: { min: 4, max: 12.5 },
           },
         },
         detectRetina: true,
